@@ -191,7 +191,7 @@ class App extends React.Component {
                         autoPlay
                         ref={r => this.audioDom = r}
                         style={{ display: 'none' }} controls={false}
-                        src={'/audioes/bgm1.m4a'} type="audio/m4a">
+                        src={gameConfig.bgm} type="audio/m4a">
                         Your browser does not support the audio tag.
                     </audio>
                 </Container>
