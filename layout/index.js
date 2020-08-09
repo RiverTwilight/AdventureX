@@ -6,11 +6,11 @@ export default class extends React.Component {
         super(props)
     }
     render() {
-        const { siteConfig, correctPage } = this.props;
+        const { siteConfig, currentPage } = this.props;
         return (
             <>
                 <Head>
-                    <title>{`${correctPage ? (`${correctPage} - `) : ''}${siteConfig.siteName}`}</title>
+                    <title>{`${currentPage ? (`${currentPage} - `) : ''}${siteConfig.siteName}`}</title>
                 </Head>
                 <main className="main">
                     {this.props.children}

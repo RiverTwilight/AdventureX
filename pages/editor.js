@@ -12,11 +12,14 @@ export async function getStaticProps() {
 
 class App extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
+        this.state = {
+            module: []
+        }
     }
     render() {
         return (
-            <Layour siteConfig={this.props.siteConfig}>
+            <Layour siteConifg={this.props.siteConfig} currentPage="编辑器">
                 <h1>❤</h1>
             </Layour>
         )

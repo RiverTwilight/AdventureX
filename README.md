@@ -1,6 +1,6 @@
 # AdventureX
 
-A free & open text adventure game.
+开源免费的文字游戏网站，你可以使用我们的编辑器创建你自己的游戏，并通过PR或发送邮件来发布你的游戏。
 
 ## Getting Started
 
