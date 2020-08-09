@@ -1,4 +1,14 @@
 import React from 'react';
+import Layour from '../layout/index'
+
+export async function getStaticProps() {
+    const config = await import(`../data/config.json`)
+    return {
+        props: {
+            siteConfig: config.default
+        },
+    }
+}
 
 class App extends React.Component {
     constructor(props) {
@@ -6,7 +16,9 @@ class App extends React.Component {
     }
     render() {
         return (
-            <h1>asdf</h1>
+            <Layour>
+                <h1>❤</h1>
+            </Layour>
         )
     }
 }

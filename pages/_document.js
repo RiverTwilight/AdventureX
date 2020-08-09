@@ -22,12 +22,11 @@ export default class extends Document {
         }
     }
     render() {
-        const { siteName, description, author } = this.props.config
+        const { siteName, description, author } = this.props.config;
         return (
             <html>
                 <Head>
                     <meta charSet="utf-8" />
-                    <title>{siteName}</title>
                     <link rel="icon" href="/static/image/favicon.ico" />
                     <meta name="viewport" content="width=device-width, initial-scale=1" />
                     <meta name="theme-color" content="#000000" />

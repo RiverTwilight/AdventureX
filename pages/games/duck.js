@@ -2,7 +2,17 @@ import React from 'react';
 import story from '../../data/story'
 import Copy from '../../layout/copyright'
 import Info from '../../layout/info'
+import Layour from '../../layout/index'
 import styled, { css } from 'styled-components'
+
+export async function getStaticProps() {
+    const config = await import(`../../data/config.json`)
+    return {
+        props: {
+            siteConfig: config.default
+        },
+    }
+}
 
 const Mask = styled.div`
     height: 80px;
@@ -71,61 +81,63 @@ class App extends React.Component {
     render() {
         const { id, text, music, currentText, playIndex } = this.state;
         return (
-            <Container>
-                <h3 style={{
-                    textAlign: 'center',
-                    position: id === 0 ? 'static' : 'fixed',
-                    top: '5px',
-                    left: '5px',
-                    fontSize: id === 0 ? 'auto' : '15px'
-                }}>GangBade duck and birthday Chocolate</h3>
-                <div className="container paper inner border" >
-                    <div
-                        className={`textarea`}
-                        ref={r => this.textArea = r}
-                        dangerouslySetInnerHTML={
-                            {
-                                __html: currentText.replace(/\n/g, '<br>')
+            <Layour siteConfig={this.props.siteConfig} >
+                <Container>
+                    <h3 style={{
+                        textAlign: 'center',
+                        position: id === 0 ? 'static' : 'fixed',
+                        top: '5px',
+                        left: '5px',
+                        fontSize: id === 0 ? 'auto' : '15px'
+                    }}>GangBade duck and birthday Chocolate</h3>
+                    <div className="container paper inner border" >
+                        <div
+                            className={`textarea`}
+                            ref={r => this.textArea = r}
+                            dangerouslySetInnerHTML={
+                                {
+                                    __html: currentText.replace(/\n/g, '<br>')
+                                }
                             }
-                        }
-                        style={{
-                            maxHeight: '50vh',
-                            overflowY: 'scroll',
-                            lineHeight: '25px'
-                        }}>
-                    </div>
-                    <Mask display={id !== 0} />
-                    <br></br>
-                    {(playIndex > text.length - 1) && story[id].action && story[id].action.map(action => (
-                        <button
-                            className="btn-small" onClick={() => {
-                                this.setState({
-                                    id: action.to,
-                                    text: [...text, ...story[action.to].text.split('\n')]
-                                })
+                            style={{
+                                maxHeight: '50vh',
+                                overflowY: 'scroll',
+                                lineHeight: '25px'
                             }}>
-                            {action.text}
-                        </button>
-                    ))}
-                </div>
-                <Copy />
-                <Info icon={'♻'} alt={'重置'} order={0} onClick={() => {
-                    window.location.reload()
-                }} />
-                <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
-                    this.setState({
-                        music: !music
-                    })
-                }} />
-                <audio
-                    loop
-                    autoPlay
-                    ref={r => this.audioDom = r}
-                    style={{ display: 'none' }} controls={false}
-                    src={'/audioes/bgm1.m4a'} type="audio/m4a">
-                    Your browser does not support the audio tag.
+                        </div>
+                        <Mask display={id !== 0} />
+                        <br></br>
+                        {(playIndex > text.length - 1) && story[id].action && story[id].action.map(action => (
+                            <button
+                                className="btn-small" onClick={() => {
+                                    this.setState({
+                                        id: action.to,
+                                        text: [...text, ...story[action.to].text.split('\n')]
+                                    })
+                                }}>
+                                {action.text}
+                            </button>
+                        ))}
+                    </div>
+                    <Copy />
+                    <Info icon={'♻'} alt={'重置'} order={0} onClick={() => {
+                        window.location.reload()
+                    }} />
+                    <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
+                        this.setState({
+                            music: !music
+                        })
+                    }} />
+                    <audio
+                        loop
+                        autoPlay
+                        ref={r => this.audioDom = r}
+                        style={{ display: 'none' }} controls={false}
+                        src={'/audioes/bgm1.m4a'} type="audio/m4a">
+                        Your browser does not support the audio tag.
                     </audio>
-            </Container>
+                </Container>
+            </Layour>
         )
     }
 }
