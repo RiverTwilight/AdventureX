@@ -28,7 +28,6 @@ export default class extends Document {
                 <Head>
                     <meta charSet="utf-8" />
                     <link rel="icon" href="/static/image/favicon.ico" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1" />
                     <meta name="theme-color" content="#000000" />
                     <meta name="description" content={description} />
                     <meta property="og:type" content="website" />

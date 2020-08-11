@@ -1,5 +1,5 @@
-import '../styles/globals.css'
 import '../node_modules/papercss/dist/paper.min.css'
+import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />

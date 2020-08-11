@@ -11,6 +11,7 @@ export default class extends React.Component {
             <>
                 <Head>
                     <title>{`${currentPage ? (`${currentPage} - `) : ''}${siteConfig.siteName}`}</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
                 </Head>
                 <main className="main">
                     {this.props.children}
