@@ -3,6 +3,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: url(/images/bg2.png);
+  overflow-x: hidden;
   animation: animation 100s linear infinite;
 }
 
