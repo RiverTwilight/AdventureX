@@ -29,7 +29,6 @@ export async function getStaticProps({ ...ctx }) {
 
     const { slug } = ctx.params
 
-    console.log()
     const content = await import(`../../games/${slug}.js`)
     const data = content.default
     const config = await import(`../../data/config.json`);
@@ -70,15 +69,12 @@ export async function getStaticPaths() {
     }
 }
 
-
 const Mask = styled.div`
-    height: 80px;
-    margin-top: -80px;
+    height: 50px;
+    margin-top: -50px;
     position: inherit;
-    display: none;
     background-image: linear-gradient(rgba(255, 255, 255, 0), #fff);
     background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-    ${props => props.display && css`display: block`}
 `
 
 const Container = styled.div`
@@ -96,81 +92,92 @@ const Container = styled.div`
     }
 `
 
+const ScrollText = ({ text }) => {
+    return (
+        <>
+            <div
+                className={`textarea`}
+                style={{
+                    height: '60vh',
+                    overflowY: 'scroll',
+                    paddingBottom: '40px'
+                }}>
+                {text.pop().split('\n').reverse().map((para, i, paras) => (
+                    <div style={{
+                        animationDelay: `${(paras.length - i) * 500}ms`,
+                        margin: '5px 0',
+                    }} className="shockin" key={para + i}>
+                        {para}
+                    </div>
+                ))}
+            </div>
+            <Mask />
+        </>
+    )
+}
+
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            // 执行到的游戏模块ID
             id: 0,
-            text: [props.gameStory[0].text],
-            currentText: props.gameStory[0].text,
-            playIndex: 1,
-            music: true
+            // 执行过的游戏模块文案
+            historyText: [props.gameStory[0].text],
+            // 是否播放音乐
+            music: false
         }
     }
     componentDidMount() {
         if (localStorage.history) {
             // this.setState(JSON.parse(localStorage.histroy))
         }
+        this.toggleBgm()
     }
-    componentDidUpdate() {
+    toggleBgm() {
+        if (this.props.gameStory[this.state.id].bgm) {
+            this.audioDom.src = this.props.gameStory[this.state.id].bgm
+        }
         if (this.state.music) {
             this.audioDom.play()
         } else {
             this.audioDom.pause();
         }
-        if (!window.update) {
-            window.update = window.setInterval(() => {
-                const { playIndex, currentText, text, id } = this.state
-                if (playIndex < text.length) {
-                    this.setState({
-                        currentText: text[playIndex] + '\n' + currentText,
-                        playIndex: playIndex + 1
-                    })
-                    localStorage.setItem('history', JSON.stringify({
-                        id: id,
-                        text: text,
-                        currentText: currentText
-                    }))
-                }
-            }, 100)
-        }
+    }
+    componentDidUpdate() {
+        this.toggleBgm()
     }
     render() {
-        const { id, text, music, currentText, playIndex } = this.state;
-        const { gameStory, gameConfig } = this.props
+        console.log(this.state.historyText)
+        const { id, music, historyText } = this.state;
+        const { gameStory, gameConfig } = this.props;
+        console.log((historyText[historyText.length - 1].split('\n').length - 1) * 500)
         return (
             <Layour siteConfig={this.props.siteConfig} >
                 <Container>
-                    <h3 style={{
+                    <a href="/" style={{
                         textAlign: 'center',
                         position: id === 0 ? 'static' : 'fixed',
                         top: '5px',
                         left: '5px',
-                        fontSize: id === 0 ? 'auto' : '15px'
-                    }}>{gameConfig.name}</h3>
+                        fontSize: id === 0 ? '30px' : '15px',
+                        background: 'none'
+                    }}>{gameConfig.name}</a>
                     <div className="container paper inner border" >
-                        <div
-                            className={`textarea`}
-                            ref={r => this.textArea = r}
-                            dangerouslySetInnerHTML={
-                                {
-                                    __html: currentText.replace(/\n/g, '<br>')
-                                }
-                            }
-                            style={{
-                                maxHeight: '50vh',
-                                overflowY: 'scroll',
-                                lineHeight: '25px'
-                            }}>
-                        </div>
-                        <Mask display={id !== 0} />
+                        <ScrollText
+                            text={historyText}
+                        />
                         <br></br>
-                        {(playIndex > text.length - 1) && gameStory[id].action && gameStory[id].action.map(action => (
+                        {gameStory[id].action && gameStory[id].action.map(action => (
                             <button
-                                className="btn-small" onClick={() => {
+                                key={action.to + action.text.substr(0,3)}
+                                style={{
+                                    animationDelay: `${(historyText[historyText.length - 1].split('\n').length - 1) * 500}ms`
+                                }}
+                                className="shockin btn-small" onClick={() => {
                                     this.setState({
                                         id: action.to,
-                                        text: [...text, ...gameStory[action.to].text.split('\n')]
+                                        historyText: [...historyText, gameStory[action.to].text]
                                     })
                                 }}>
                                 {action.text}
@@ -191,7 +198,7 @@ class App extends React.Component {
                         autoPlay
                         ref={r => this.audioDom = r}
                         style={{ display: 'none' }} controls={false}
-                        src={gameConfig.bgm} type="audio/m4a">
+                        type="audio/m4a">
                         Your browser does not support the audio tag.
                     </audio>
                 </Container>

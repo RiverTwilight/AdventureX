@@ -13,6 +13,46 @@ body {
   }
 }
 
+@keyframes shockin {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  50%{
+    width: auto;
+    height: auto;
+  }
+  to {
+    width: auto;
+    height: auto;
+    opacity: 1;
+  }
+}
+
+.shockin {
+  overflow: hidden;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  animation: .8s shockin forwards;
+}
+
+@keyframes fadeinanimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadein {
+  opacity: 0;
+  overflow: hidden;
+  animation: 0.8s fadeinanimation forwards;
+}
+
 .tabs > input {
   display: none !important;
 }
