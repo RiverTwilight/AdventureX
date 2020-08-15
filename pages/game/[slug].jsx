@@ -84,7 +84,6 @@ const Mask = styled.div`
 `
 
 const Container = styled.div`
-    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -92,30 +91,27 @@ const Container = styled.div`
     font-size: calc(10px + 2vmin);
     color: #000;
     transition: all 0.4s;
-    .inner{
-        max-height: 90vh;
-        min-height: 20vh;
-    }
 `
 
 const Caption = styled.div`
     @keyframes shockin${props => props.delay} {
         to{
             ${props => props.delay && css`
-            margin-top: calc( -${props.delay * 20}px + 40vh);
+            margin-top: calc( -${props.delay * 20}px + 60vh);
             `}
         }
     }
-    ${props => props.delay && css`
-    margin-top: 60vh;
-    `}
+    &: hover{
+        animation-play-state: paused
+    }
+    margin-top: 71vh;
     font-size: 18px;
     ${props => props.delay && css`
-    animation: ${props.delay * 1000}ms linear shockin${props => props.delay} forwards;
+    animation: ${props.delay * 100}ms linear shockin${props => props.delay} forwards;
     `}
 `
 
-const ScrollText = ({ text }) => {
+const ScrollText = ({ text, action, onClick }) => {
     if (!text) return null
     return (
         <>
@@ -123,8 +119,8 @@ const ScrollText = ({ text }) => {
             <div
                 className={`textarea`}
                 style={{
-                    height: '60vh',
-                    overflowY: 'scroll'
+                    height: '70vh',
+                    overflowY: 'hidden'
                 }}>
                 <Caption
                     key={text.substr(0, 10)}
@@ -134,6 +130,13 @@ const ScrollText = ({ text }) => {
                         <div style={{
                             margin: '8px 0'
                         }} key={para + i}>{para}</div>
+                    ))}
+                    {action && action.map(action => (
+                        <button
+                            key={action.to + action.text.substr(0, 3)}
+                            className="btn-small" onClick={() => onClick(action.to)}>
+                            {action.text}
+                        </button>
                     ))}
                 </Caption>
             </div>
@@ -177,54 +180,56 @@ class App extends React.Component {
         const { id, music, historyText } = this.state;
         const { gameStory, gameConfig } = this.props;
         return (
-            <Layour siteConfig={this.props.siteConfig} >
-                <Container>
-                    <a href="/" style={{
-                        textAlign: 'center',
-                        position: id === 0 ? 'static' : 'fixed',
-                        top: '5px',
-                        left: '5px',
-                        fontSize: id === 0 ? '30px' : '15px',
-                        background: 'none'
-                    }}>{gameConfig.name}</a>
-                    <div className="container paper inner border" >
-                        <ScrollText
-                            text={gameStory[id].text}
-                        />
-                        {gameStory[id].action && gameStory[id].action.map(action => (
-                            <button
-                                key={action.to + action.text.substr(0, 3)}
-                                style={{
-                                    animationDelay: `${(gameStory[id].text.split('\n').length - 1) * 1000}ms`
-                                }}
-                                className="fadein btn-small" onClick={() => {
-                                    this.setState({
-                                        id: action.to,
-                                        historyText: [...historyText, gameStory[action.to].text]
-                                    })
-                                }}>
-                                {action.text}
-                            </button>
-                        ))}
+            <Layour currentPage={gameConfig.name} siteConfig={this.props.siteConfig} >
+                <div style={{
+                    paddingTop: '40px'
+                }} className="row">
+                    <div className="sm-6 md-8 lg-8 col">
+                        <Container>
+                            {/*<h4 href="/" style={{
+                                textAlign: 'center',
+                                position: 'static',
+                                display: historyText.length > 1 ? "none" : "block",
+                                background: 'none'
+                            }}>{gameConfig.name}</h4>*/}
+                            <div className="container paper" >
+                                <ScrollText
+                                    action={gameStory[id].action}
+                                    onClick={to => {
+                                        this.setState({
+                                            id: to,
+                                            historyText: [...historyText, gameStory[to].text]
+                                        })
+                                    }}
+                                    text={gameStory[id].text}
+                                />
+
+                            </div>
+                            <Info icon={'♻'} alt={'重置'} order={0} onClick={() => {
+                                window.location.reload()
+                            }} />
+                            <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
+                                this.setState({
+                                    music: !music
+                                }, this.toggleBgm)
+                            }} />
+                            <audio
+                                loop
+                                autoPlay
+                                ref={r => this.audioDom = r}
+                                style={{ display: 'none' }} controls={false}
+                                type="audio/m4a">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </Container>
                     </div>
-                    <Copy />
-                    <Info icon={'♻'} alt={'重置'} order={0} onClick={() => {
-                        window.location.reload()
-                    }} />
-                    <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
-                        this.setState({
-                            music: !music
-                        }, this.toggleBgm)
-                    }} />
-                    <audio
-                        loop
-                        autoPlay
-                        ref={r => this.audioDom = r}
-                        style={{ display: 'none' }} controls={false}
-                        type="audio/m4a">
-                        Your browser does not support the audio tag.
-                    </audio>
-                </Container>
+                    <div className="sm-6 md-4 lg-4 col">
+                        <div className="padding-small container paper">
+                        </div>
+                        <Copy />
+                    </div>
+                </div>
+
             </Layour>
         )
     }

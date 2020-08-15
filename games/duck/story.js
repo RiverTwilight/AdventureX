@@ -1,6 +1,6 @@
 export default [
     {
-        id: 0,
+        id: 'start',
         text: `江村暮 与 LOYI 为您呈现
             `,
         bgm: "/audioes/bgm2.m4a",
@@ -170,8 +170,8 @@ export default [
                 to: 4,
                 text: '渡河时 加油鸭 的指向与河岸垂直'
             }, {
-                to: 3,
-                text: '渡河时 加油鸭 的指向与河岸垂直'
+                to: '45d',
+                text: '渡河时 加油鸭 的指向与河岸呈45度 '
             }
         ]
     }, {
@@ -272,6 +272,15 @@ export default [
 
             (完)
 
-            `
+            `,
+        action: [
+            {
+                to: 0,
+                text: '从新开始'
+            }
+        ]
+    }, {
+        id: "45d",
+        text: ``
     }
 ]
