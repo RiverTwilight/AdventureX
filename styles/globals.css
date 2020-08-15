@@ -4,19 +4,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-image: url(/images/bg2.png);
   overflow-x: hidden;
-  animation: animation 100s linear infinite;
+  animation: animation 100s linear infinite alternate;
 }
 
 @keyframes animation {
   100% {
     background-position: 0px -3000px;
-  }
-}
-
-@keyframes shockin {
-  to {
-    margin-bottom: 0px;
-    opacity: 1;
   }
 }
 

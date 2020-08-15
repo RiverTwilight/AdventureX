@@ -106,7 +106,6 @@ const Caption = styled.div`
             `}
         }
     }
-    --windowHeight: calc(100vh);
     ${props => props.delay && css`
     margin-top: 60vh;
     `}
