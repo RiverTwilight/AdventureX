@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Layour from '../layout/index'
+import Layour from '../layout'
 import WithNav from '../layout/WithNav';
 import Form from '../utils/Form'
 import styled, { css } from 'styled-components'
@@ -173,7 +173,7 @@ class Editor extends React.Component {
                                     </div>
 
                                     <div className="content" id="content2">
-                                        <div className=" row">
+                                        <div className="row">
                                             {gameModule.map((config, i) => (
                                                 <GameModule
                                                     config={config}

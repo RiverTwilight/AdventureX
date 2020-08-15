@@ -1,7 +1,7 @@
 import React from 'react';
 import Copy from '../../layout/copyright'
 import Info from '../../layout/info'
-import Layour from '../../layout/index'
+import Layour from '../../layout'
 import styled, { css } from 'styled-components'
 import glob from 'glob'
 
@@ -13,10 +13,10 @@ export async function getStaticProps({ ...ctx }) {
         const data = keys.map((key, index) => {
             // Create slug from filename
             const slug = key
-                .replace(/^.*[\\\/]/, '')
-                .split('.')
-                .slice(0, -1)
-                .join('.')
+                .split('/')[1]
+                .split('/')[0]
+                .replace(/ /g, '-')
+                .trim()
             const value = values[index]
             return {
                 gameConfig: value.default.config,
@@ -24,12 +24,14 @@ export async function getStaticProps({ ...ctx }) {
                 slug: slug,
             }
         })
+        console.log(data)
+
         return data
-    })(require.context('../../games', true, /\.js$/))
+    })(require.context(`../../games/`, true, /index\.js$/))
 
     const { slug } = ctx.params
 
-    const content = await import(`../../games/${slug}.js`)
+    const content = await import(`../../games/${slug}/index.js`)
     const data = content.default
     const config = await import(`../../data/config.json`);
 
@@ -46,22 +48,19 @@ export async function getStaticProps({ ...ctx }) {
 
 export async function getStaticPaths() {
     //get all .md files in the posts dir
-    const games = glob.sync('games/**/*.js')
-
+    const games = glob.sync('games/**/index.js')
 
     // remove path and extension to leave filename only
     const gameSlugs = games.map(file =>
         file
             .split('/')[1]
+            .split('/')[0]
             .replace(/ /g, '-')
-            .slice(0, -3)
             .trim()
     )
 
     // create paths with `slug` param
     const paths = gameSlugs.map(slug => `/game/${encodeURI(slug)}`)
-
-    console.log(paths)
 
     return {
         paths,
@@ -70,15 +69,15 @@ export async function getStaticPaths() {
 }
 
 const Mask = styled.div`
-    height: 50px;
-    margin-top: -50px;
+    height: 30px;
+    margin-top: -30px;
     position: inherit;
     background-image: linear-gradient(rgba(255, 255, 255, 0), #fff);
     background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
 `
 
 const Container = styled.div`
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -92,24 +91,43 @@ const Container = styled.div`
     }
 `
 
+const Caption = styled.div`
+    @keyframes shockin${props => props.delay} {
+        to{
+            ${props => props.delay && css`
+            margin-top: ${-props.delay * 20 * 100 / window.innerHeight + 40}vh;
+            `}
+        }
+    }
+    ${props => props.delay && css`
+    margin-top: 60vh;
+    `}
+    font-size: 18px;
+    ${props => props.delay && css`
+    animation: ${props.delay * 1000}ms linear shockin${props => props.delay} forwards;
+    `}
+`
+
 const ScrollText = ({ text }) => {
+    if (!text) return null
     return (
         <>
             <div
                 className={`textarea`}
                 style={{
                     height: '60vh',
-                    overflowY: 'scroll',
-                    paddingBottom: '40px'
+                    overflowY: 'scroll'
                 }}>
-                {text.pop().split('\n').reverse().map((para, i, paras) => (
-                    <div style={{
-                        animationDelay: `${(paras.length - i) * 500}ms`,
-                        margin: '5px 0',
-                    }} className="shockin" key={para + i}>
-                        {para}
-                    </div>
-                ))}
+                <Caption
+                    key={text.substr(0, 10)}
+                    delay={text.split('\n').length}
+                >
+                    {text.split('\n').map((para, i) => (
+                        <div style={{
+                            margin: '8px 0'
+                        }} key={para + i}>{para}</div>
+                    ))}
+                </Caption>
             </div>
             <Mask />
         </>
@@ -125,7 +143,7 @@ class App extends React.Component {
             // 执行过的游戏模块文案
             historyText: [props.gameStory[0].text],
             // 是否播放音乐
-            music: false
+            music: true
         }
     }
     componentDidMount() {
@@ -148,10 +166,8 @@ class App extends React.Component {
         this.toggleBgm()
     }
     render() {
-        console.log(this.state.historyText)
         const { id, music, historyText } = this.state;
         const { gameStory, gameConfig } = this.props;
-        console.log((historyText[historyText.length - 1].split('\n').length - 1) * 500)
         return (
             <Layour siteConfig={this.props.siteConfig} >
                 <Container>
@@ -165,16 +181,15 @@ class App extends React.Component {
                     }}>{gameConfig.name}</a>
                     <div className="container paper inner border" >
                         <ScrollText
-                            text={historyText}
+                            text={gameStory[id].text}
                         />
-                        <br></br>
                         {gameStory[id].action && gameStory[id].action.map(action => (
                             <button
-                                key={action.to + action.text.substr(0,3)}
+                                key={action.to + action.text.substr(0, 3)}
                                 style={{
-                                    animationDelay: `${(historyText[historyText.length - 1].split('\n').length - 1) * 500}ms`
+                                    animationDelay: `${(gameStory[id].text.split('\n').length - 1) * 800 + gameStory[id].text.replace(/[\n\s]/g, '').length * 20}ms`
                                 }}
-                                className="shockin btn-small" onClick={() => {
+                                className="fadein btn-small" onClick={() => {
                                     this.setState({
                                         id: action.to,
                                         historyText: [...historyText, gameStory[action.to].text]
@@ -191,7 +206,7 @@ class App extends React.Component {
                     <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
                         this.setState({
                             music: !music
-                        })
+                        }, this.toggleBgm)
                     }} />
                     <audio
                         loop

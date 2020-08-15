@@ -1,5 +1,5 @@
 import React from 'react';
-import Layour from '../layout/index'
+import Layour from '../layout'
 import WithNav from '../layout/WithNav';
 import styled from 'styled-components'
 

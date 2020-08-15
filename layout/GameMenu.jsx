@@ -13,7 +13,7 @@ const Navbar = ({ siteConfig, children }) => (
     <>
         <nav className="border fixed split-nav">
             <div className="nav-brand">
-                <h3><Link title={siteConfig.siteName} href="/">{siteConfig.siteName}</Link></h3>
+                <h3><a title={siteConfig.siteName} href="/">{siteConfig.siteName}</a></h3>
             </div>
             <div className="collapsible">
                 <input id="collapsible1" type="checkbox" name="collapsible1" />
@@ -25,7 +25,7 @@ const Navbar = ({ siteConfig, children }) => (
                 <div className="collapsible-body">
                     <ul className="inline">
                         <li><Link href="/editor">+创建游戏</Link></li>
-                        <li><Link href="/showcase">🎮陈列柜</Link></li>
+                        <li><Link href="/game/duck">🎮游玩</Link></li>
                         <li><a href="https://github.com/RiverTwilight/AdventureX">Github</a></li>
                     </ul>
                 </div>
