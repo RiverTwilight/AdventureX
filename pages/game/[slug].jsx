@@ -69,11 +69,18 @@ export async function getStaticPaths() {
 }
 
 const Mask = styled.div`
-    height: 30px;
-    margin-top: -30px;
+    height: 20px;
     position: inherit;
-    background-image: linear-gradient(rgba(255, 255, 255, 0), #fff);
-    background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    ${props => props.bottom && css`
+        margin-top: -18px;
+        background-image: linear-gradient(rgba(255, 255, 255, 0), #fff);
+        background: -o-linear-gradient(bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    `}
+    ${props => props.top && css`
+        margin-bottom: -20px;
+        background-image: linear-gradient(#fff, rgba(255, 255, 255, 0));
+        background: -o-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    `}
 `
 
 const Container = styled.div`
@@ -95,10 +102,11 @@ const Caption = styled.div`
     @keyframes shockin${props => props.delay} {
         to{
             ${props => props.delay && css`
-            margin-top: ${-props.delay * 20 * 100 / window.innerHeight + 40}vh;
+            margin-top: calc( -${props.delay * 20}px + 40vh);
             `}
         }
     }
+    --windowHeight: calc(100vh);
     ${props => props.delay && css`
     margin-top: 60vh;
     `}
@@ -112,6 +120,7 @@ const ScrollText = ({ text }) => {
     if (!text) return null
     return (
         <>
+            <Mask top />
             <div
                 className={`textarea`}
                 style={{
@@ -129,7 +138,7 @@ const ScrollText = ({ text }) => {
                     ))}
                 </Caption>
             </div>
-            <Mask />
+            <Mask bottom />
         </>
     )
 }
@@ -187,7 +196,7 @@ class App extends React.Component {
                             <button
                                 key={action.to + action.text.substr(0, 3)}
                                 style={{
-                                    animationDelay: `${(gameStory[id].text.split('\n').length - 1) * 800 + gameStory[id].text.replace(/[\n\s]/g, '').length * 20}ms`
+                                    animationDelay: `${(gameStory[id].text.split('\n').length - 1) * 1000}ms`
                                 }}
                                 className="fadein btn-small" onClick={() => {
                                     this.setState({
