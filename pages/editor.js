@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import Layour from '../layout'
 import WithNav from '../layout/WithNav';
 import Form from '../utils/Form'
+import JSZip from 'jszip'
 import styled, { css } from 'styled-components'
+
+export async function getStaticProps() {
+    const config = await import(`../data/config.json`)
+    return {
+        props: {
+            siteConfig: config.default
+        },
+    }
+}
 
 const TAB_CONFIG = [{
     id: 'tab1',
@@ -82,16 +92,14 @@ const TextEditor = ({ show, onValueChange }) => {
     )
 }
 
-export async function getStaticProps() {
-    const config = await import(`../data/config.json`)
-    return {
-        props: {
-            siteConfig: config.default
-        },
-    }
+function download(file, name) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click()
 }
 
-const GameModule = ({ onDelete, onEdit, config: { text, id } }) => {
+const GameModule = ({ onDelete, onEdit, config: { text, id, action } }) => {
     const [showEditor, setShowEditor] = useState(false)
     return (
         <>
@@ -99,7 +107,9 @@ const GameModule = ({ onDelete, onEdit, config: { text, id } }) => {
             <div className="card sm-6 md-6 lg-6 col">
                 <div className="card-body">
                     <h4 className="card-title">{id || '未命名'}</h4>
-                    <h5 className="card-subtitle">Nice looking subtitle.</h5>
+                    {/*<h5 className="card-subtitle">{action.map(({ text, to }) => (
+                        <span>{text}</span>
+                    ))}</h5>*/}
                     <p className="card-text">{`${text.substr(0, 50)}${text.length > 50 ? '...' : ''}`}</p>
                     <button
                         onClick={() => {
@@ -155,6 +165,28 @@ class Editor extends React.Component {
             }]
         })
     }
+    input() {
+        // todo
+    }
+    export() {
+        const { gameModule, gameConfig } = this.state;
+        const zip = new JSZip();
+        var project = zip.folder(gameConfig.name);
+        project.file("index.js", `
+            import story from './story.js'; export default{
+                config: ${JSON.stringify(gameConfig)},
+                story
+            }
+        `);
+        project.file("story.js", `
+            export default${JSON.stringify(gameModule)}
+        `);
+        zip.generateAsync({ type: "blob" })
+            .then(function (content) {
+                // see FileSaver.js
+                download(content, `${gameConfig.name}.project.zip`);
+            });
+    }
     render() {
         const { gameModule, gameConfig, activeTab } = this.state;
         const { siteConfig } = this.props
@@ -208,7 +240,13 @@ class Editor extends React.Component {
                                                 />
                                             ))}
                                         </div>
-                                        <button onClick={this.addNewModule.bind(this)}>+</button>
+                                        <button
+                                            style={{
+                                                position: 'absolute',
+                                                top: '5px',
+                                                right: '5px'
+                                            }}
+                                            onClick={this.addNewModule.bind(this)}>+</button>
                                     </div>
 
                                 </div>
@@ -217,9 +255,17 @@ class Editor extends React.Component {
                         <div className="sm-6 md-4 lg-4 col">
                             <div className="padding-small container paper">
                                 <p>📄数据将自动保存到缓存中</p>
-                                <button className="btn-small">导出</button>
-                                <button className="btn-small">导入</button>
-                                <button className="btn-success btn-small">🕹运行游戏</button>
+                                <button
+                                    onClick={this.export.bind(this)}
+                                    className="btn-small">导出</button>
+                                <input onChange={e => {
+                                    console.log(e)
+                                }} className="btn-small" />
+                                <button
+                                    onClick={() => {
+                                        window.open('/game/test')
+                                    }}
+                                    className="btn-success btn-small">🕹运行游戏</button>
                                 <p>
                                     想要将游戏发布到陈列柜里吗？
                                     你可以给我发送邮件或到

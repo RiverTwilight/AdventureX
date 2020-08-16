@@ -7,6 +7,7 @@ import glob from 'glob'
 
 export async function getStaticProps({ ...ctx }) {
 
+    console.log(ctx)
     const games = (context => {
         const keys = context.keys()
         const values = keys.map(context)
@@ -169,6 +170,12 @@ class App extends React.Component {
     componentDidMount() {
         if (localStorage.history) {
             // this.setState(JSON.parse(localStorage.histroy))
+        }
+        if(location.pathname === "/game/test"){
+            if(localStorage.editorCache){
+                 console.log(JSON.parse(localStorage.editorCache))
+                //this.setState(JSON.parse(localStorage.editorCache))
+            }
         }
         this.toggleBgm()
     }

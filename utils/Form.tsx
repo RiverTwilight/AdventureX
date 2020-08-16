@@ -25,7 +25,6 @@ const Form = ({ config, onValueChange, defaultValue = {} }: {
     return (
         <fieldset className="form-group">
             {config.map(({ header, type, placeholder, block, id }, index) => {
-                console.log(formContent[id])
                 switch (type) {
                     case 'switch': return (
                         <React.Fragment key={id}>

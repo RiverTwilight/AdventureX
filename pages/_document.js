@@ -27,7 +27,7 @@ export default class extends Document {
             <html>
                 <Head>
                     <meta charSet="utf-8" />
-                    <link rel="icon" href="/static/image/favicon.ico" />
+                    <link rel="icon" href="/favicon.ico" />
                     <meta name="theme-color" content="#000000" />
                     <meta name="description" content={description} />
                     <meta property="og:type" content="website" />
@@ -40,8 +40,7 @@ export default class extends Document {
                     <meta property="article:tag" content={author.name} />
                     <meta property="article:tag" content="云极客" />
                     <meta name="twitter:card" content="summary" />
-                    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-                    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+                    <link rel="apple-touch-icon" href="/logo192.png" />
                     <meta name="renderer" content="webkit" />
                     <meta name="force-rendering" content="webkit" />
                     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />

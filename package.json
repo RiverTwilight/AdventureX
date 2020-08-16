@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "glob": "^7.1.6",
+    "jszip": "^3.5.0",
     "next": "9.5.1",
     "papercss": "^1.7.0",
     "react": "16.13.1",
