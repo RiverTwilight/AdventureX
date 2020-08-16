@@ -28,10 +28,10 @@ const GAME_CONFIG_FORM = [{
     id: "name",
     block: true
 }, {
-    header: "背景音乐",
-    id: "bgm",
+    header: "游戏介绍",
+    id: "intro",
     block: true,
-    placeholder: "请填写链接，暂不支持上传"
+    placeholder: "让更多的人对你的游戏感兴趣"
 }, {
     header: "背景图片",
     id: "bg",
@@ -74,12 +74,10 @@ const Drawer = styled.div`
     `};
 `
 
-const TextEditor = ({ show }) => {
+const TextEditor = ({ show, onValueChange }) => {
     return (
         <Drawer className="border" show={show}>
-            <Form onValueChange={values => {
-                console.log(values)
-            }} config={MODULE_CONFIG_FORM} />
+            <Form onValueChange={onValueChange} config={MODULE_CONFIG_FORM} />
         </Drawer>
     )
 }
@@ -93,11 +91,11 @@ export async function getStaticProps() {
     }
 }
 
-const GameModule = ({ onDelete, config: { text, id } }) => {
+const GameModule = ({ onDelete, onEdit, config: { text, id } }) => {
     const [showEditor, setShowEditor] = useState(false)
     return (
         <>
-            <TextEditor show={showEditor} />
+            <TextEditor onValueChange={onEdit} show={showEditor} />
             <div className="card sm-6 md-6 lg-6 col">
                 <div className="card-body">
                     <h4 className="card-title">{id || '未命名'}</h4>
@@ -123,18 +121,32 @@ class Editor extends React.Component {
         super(props);
         this.state = {
             gameModule: [],
-            gameConfig: {},
+            gameConfig: null,
             activeTab: 'tab1',
             showEditor: false
         }
     }
     componentDidMount() {
-        window.onbeforeunload = function (event) {
+        /*window.onbeforeunload = function (event) {
             return '您可能有数据没有保存';
-        };
+        };*/
+        if (localStorage.editorCache) {
+            const { gameConfig, gameModule } = JSON.parse(localStorage.editorCache)
+            this.setState({
+                gameModule,
+                gameConfig
+            })
+        }
     }
     componentWillUnmount() {
-        window.onbeforeunload = null
+        // window.onbeforeunload = null
+    }
+    componentDidUpdate() {
+        const { gameModule, gameConfig } = this.state;
+        localStorage.setItem('editorCache', JSON.stringify({
+            gameModule,
+            gameConfig
+        }))
     }
     addNewModule() {
         this.setState({
@@ -144,7 +156,8 @@ class Editor extends React.Component {
         })
     }
     render() {
-        const { gameModule, gameConfig, activeTab } = this.state
+        const { gameModule, gameConfig, activeTab } = this.state;
+        const { siteConfig } = this.props
         return (
             <Layour siteConfig={this.props.siteConfig} currentPage="编辑器">
                 <WithNav siteConfig={this.props.siteConfig}>
@@ -165,13 +178,16 @@ class Editor extends React.Component {
                                             >{tab.text}</label>
                                         </React.Fragment>
                                     ))}
-
                                     <div className="content" id="content1">
-                                        <Form onValueChange={values => {
-                                            console.log(values)
-                                        }} config={GAME_CONFIG_FORM} />
+                                        <Form
+                                            defaultValue={gameConfig}
+                                            onValueChange={values => {
+                                                this.setState({
+                                                    gameConfig: values
+                                                })
+                                            }}
+                                            config={GAME_CONFIG_FORM} />
                                     </div>
-
                                     <div className="content" id="content2">
                                         <div className="row">
                                             {gameModule.map((config, i) => (
@@ -185,7 +201,7 @@ class Editor extends React.Component {
                                                     }}
                                                     onDelete={i => {
                                                         this.setState({
-
+                                                            gameModule: gameModule.splice(i, 1)
                                                         })
                                                     }}
                                                     key={config.id || i}
@@ -200,10 +216,16 @@ class Editor extends React.Component {
                         </div>
                         <div className="sm-6 md-4 lg-4 col">
                             <div className="padding-small container paper">
+                                <p>📄数据将自动保存到缓存中</p>
                                 <button className="btn-small">导出</button>
                                 <button className="btn-small">导入</button>
-                                <button className="btn-secondary btn-small">发布</button>
                                 <button className="btn-success btn-small">🕹运行游戏</button>
+                                <p>
+                                    想要将游戏发布到陈列柜里吗？
+                                    你可以给我发送邮件或到
+                                    <a href={siteConfig.github}>github</a>
+                                    上PR
+                                </p>
                                 <h4>模块目录</h4>
                             </div>
                         </div>

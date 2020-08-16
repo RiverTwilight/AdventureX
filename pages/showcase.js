@@ -44,7 +44,7 @@ class ShowCase extends React.Component {
         return (
             <Layour currentPage="陈列柜" siteConfig={this.props.siteConfig}>
                 <WithNav siteConfig={this.props.siteConfig}>
-                    <div className="container row paper border">
+                    <div className="container row paper">
                         {allGames.map(({ slug, gameConfig: { name, authors, cover } }) => (
                             <div className="paper card sm-6 md-6 lg-6 col">
                                 {cover && <img src={cover} alt="Cover"></img>}

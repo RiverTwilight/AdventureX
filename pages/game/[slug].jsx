@@ -24,7 +24,6 @@ export async function getStaticProps({ ...ctx }) {
                 slug: slug,
             }
         })
-        console.log(data)
 
         return data
     })(require.context(`../../games/`, true, /index\.js$/))
@@ -96,9 +95,7 @@ const Container = styled.div`
 const Caption = styled.div`
     @keyframes shockin${props => props.delay} {
         to{
-            ${props => props.delay && css`
-            margin-top: calc( -${props.delay * 20}px + 60vh);
-            `}
+            margin-top: calc(-${props => props.delay * 20}px + 10vh)
         }
     }
     &: hover{
@@ -106,13 +103,24 @@ const Caption = styled.div`
     }
     margin-top: 71vh;
     font-size: 18px;
-    ${props => props.delay && css`
-    animation: ${props.delay * 100}ms linear shockin${props => props.delay} forwards;
-    `}
+    animation: ${props => props.delay * 100}ms linear shockin${props => props.delay} forwards;
 `
 
 const ScrollText = ({ text, action, onClick }) => {
     if (!text) return null
+    React.useEffect(() => {
+        // 当按钮出现后暂停动画
+        window.int = setInterval(() => {
+            let target = document.querySelector('.test:last-child');
+            if (target.getBoundingClientRect().bottom < 500) {
+                clearInterval(int);
+                document.querySelector('#caption').style.animationPlayState = 'paused'
+            }
+        }, 1000)
+        return () => {
+            clearInterval(int)
+        }
+    }, [action])
     return (
         <>
             <Mask top />
@@ -123,18 +131,19 @@ const ScrollText = ({ text, action, onClick }) => {
                     overflowY: 'hidden'
                 }}>
                 <Caption
+                    id="caption"
                     key={text.substr(0, 10)}
                     delay={text.split('\n').length}
                 >
                     {text.split('\n').map((para, i) => (
                         <div style={{
                             margin: '8px 0'
-                        }} key={para + i}>{para}</div>
+                        }} class="test" key={para + i}>{para}</div>
                     ))}
-                    {action && action.map(action => (
+                    {action && action.map((action, i, actions) => (
                         <button
                             key={action.to + action.text.substr(0, 3)}
-                            className="btn-small" onClick={() => onClick(action.to)}>
+                            className="btn-small test" onClick={() => onClick(action.to)}>
                             {action.text}
                         </button>
                     ))}
@@ -154,7 +163,7 @@ class App extends React.Component {
             // 执行过的游戏模块文案
             historyText: [props.gameStory[0].text],
             // 是否播放音乐
-            music: true
+            music: false
         }
     }
     componentDidMount() {
@@ -178,7 +187,7 @@ class App extends React.Component {
     }
     render() {
         const { id, music, historyText } = this.state;
-        const { gameStory, gameConfig } = this.props;
+        const { gameStory, gameConfig, siteConfig } = this.props;
         return (
             <Layour currentPage={gameConfig.name} siteConfig={this.props.siteConfig} >
                 <div style={{
@@ -186,12 +195,6 @@ class App extends React.Component {
                 }} className="row">
                     <div className="sm-6 md-8 lg-8 col">
                         <Container>
-                            {/*<h4 href="/" style={{
-                                textAlign: 'center',
-                                position: 'static',
-                                display: historyText.length > 1 ? "none" : "block",
-                                background: 'none'
-                            }}>{gameConfig.name}</h4>*/}
                             <div className="container paper" >
                                 <ScrollText
                                     action={gameStory[id].action}
@@ -205,10 +208,7 @@ class App extends React.Component {
                                 />
 
                             </div>
-                            <Info icon={'♻'} alt={'重置'} order={0} onClick={() => {
-                                window.location.reload()
-                            }} />
-                            <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={1} onClick={() => {
+                            <Info icon={music ? '🔊' : '🔈'} alt={'音乐'} order={0} onClick={() => {
                                 this.setState({
                                     music: !music
                                 }, this.toggleBgm)
@@ -216,6 +216,7 @@ class App extends React.Component {
                             <audio
                                 loop
                                 autoPlay
+                                volume={50}
                                 ref={r => this.audioDom = r}
                                 style={{ display: 'none' }} controls={false}
                                 type="audio/m4a">
@@ -225,11 +226,20 @@ class App extends React.Component {
                     </div>
                     <div className="sm-6 md-4 lg-4 col">
                         <div className="padding-small container paper">
+                            <h4>Menu</h4>
                         </div>
-                        <Copy />
+                        <div className="padding-small container paper">
+                            <h4>{gameConfig.name}</h4>
+                            {gameConfig.intro && <p>{gameConfig.intro}</p>}
+                            <p>
+                                此游戏由{gameConfig.authors.map(au => (
+                                <a>{au}&nbsp;</a>
+                            ))}制作，发布在 <a target="_blank" href="/">{siteConfig.siteName}</a>上。
+                            </p>
+                        </div>
+                        <Copy github={siteConfig.github} />
                     </div>
                 </div>
-
             </Layour>
         )
     }
