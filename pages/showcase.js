@@ -45,22 +45,25 @@ class ShowCase extends React.Component {
             <Layour currentPage="陈列柜" siteConfig={this.props.siteConfig}>
                 <WithNav siteConfig={this.props.siteConfig}>
                     <div className="container row paper">
-                        {allGames.map(({ slug, gameConfig: { name, authors, cover } }) => (
-                            <div className="paper card sm-6 md-6 lg-6 col">
-                                {cover && <img src={cover} alt="Cover"></img>}
-                                <div className="card-body">
-                                    <h4 className="card-title">{name}</h4>
-                                    <h5 className="card-subtitle">{authors.map(author => (
-                                        <>{author}&nbsp;</>
-                                    )) || '匿名'}</h5>
-                                    <p className="card-text"></p>
-                                    <a
-                                        className="paper-btn"
-                                        href={`/game/${slug}`}
-                                    >开始游戏</a>
+                        {allGames.map(({ slug, gameConfig: { name, authors, cover, privateMode } }) => {
+                            if (privateMode) return null
+                            return (
+                                <div className="paper card sm-6 md-6 lg-6 col">
+                                    {cover && <img src={cover} alt="Cover"></img>}
+                                    <div className="card-body">
+                                        <h4 className="card-title">{name}</h4>
+                                        <h5 className="card-subtitle">{authors.map(author => (
+                                            <>{author}&nbsp;</>
+                                        )) || '匿名'}</h5>
+                                        <p className="card-text"></p>
+                                        <a
+                                            className="paper-btn"
+                                            href={`/game/${slug}`}
+                                        >开始游戏</a>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </WithNav>
             </Layour>

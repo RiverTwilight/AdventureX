@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Copy from '../../layout/copyright'
 import Info from '../../layout/info'
 import Layour from '../../layout'
@@ -99,17 +99,14 @@ const Caption = styled.div`
             margin-top: calc(-${props => props.delay * 20}px + 10vh)
         }
     }
-    &: hover{
-        animation-play-state: paused
-    }
     margin-top: 71vh;
     font-size: 18px;
-    animation: ${props => props.delay * 100}ms linear shockin${props => props.delay} forwards;
+    animation: ${props => props.delay * 200}ms linear shockin${props => props.delay} forwards;
 `
 
 const ScrollText = ({ text, action, onClick }) => {
-    if (!text) return null
-    React.useEffect(() => {
+    if (!text) return null;
+    useEffect(() => {
         // 当按钮出现后暂停动画
         window.int = setInterval(() => {
             let target = document.querySelector('.test:last-child');
@@ -117,7 +114,7 @@ const ScrollText = ({ text, action, onClick }) => {
                 clearInterval(int);
                 document.querySelector('#caption').style.animationPlayState = 'paused'
             }
-        }, 1000)
+        }, 800)
         return () => {
             clearInterval(int)
         }
@@ -135,17 +132,23 @@ const ScrollText = ({ text, action, onClick }) => {
                     id="caption"
                     key={text.substr(0, 10)}
                     delay={text.split('\n').length}
+                    onTouchEnd={() => {
+                        document.querySelector('#caption').style.animationPlayState = 'running'
+                    }}
+                    onTouchStart={() => {
+                        document.querySelector('#caption').style.animationPlayState = 'paused'
+                    }}
                 >
                     {text.split('\n').map((para, i) => (
                         <div style={{
                             margin: '8px 0'
-                        }} class="test" key={para + i}>{para}</div>
+                        }} className="test" key={para + i}>{para === "" ? "\n" : para}</div>
                     ))}
-                    {action && action.map((action, i, actions) => (
+                    {action && action.map((act, i, actions) => (
                         <button
-                            key={action.to + action.text.substr(0, 3)}
-                            className="btn-small test" onClick={() => onClick(action.to)}>
-                            {action.text}
+                            key={act.to + act.text.substr(0, 3)}
+                            className="btn-small test" onClick={() => onClick(act.to)}>
+                            {act.text}
                         </button>
                     ))}
                 </Caption>
@@ -171,9 +174,9 @@ class App extends React.Component {
         if (localStorage.history) {
             // this.setState(JSON.parse(localStorage.histroy))
         }
-        if(location.pathname === "/game/test"){
-            if(localStorage.editorCache){
-                 console.log(JSON.parse(localStorage.editorCache))
+        if (location.pathname === "/game/test") {
+            if (localStorage.editorCache) {
+                console.log(JSON.parse(localStorage.editorCache))
                 //this.setState(JSON.parse(localStorage.editorCache))
             }
         }

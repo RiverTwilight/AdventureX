@@ -27,8 +27,9 @@ class App extends React.Component {
         return (
             <Layour siteConfig={this.props.siteConfig}>
                 <WithNav siteConfig={this.props.siteConfig}>
-                    <div className="container paper border">
+                    <div className="container paper">
                         <h1 className="title">Build, Play and Share</h1>
+                        <p></p>
                     </div>
                 </WithNav>
             </Layour>

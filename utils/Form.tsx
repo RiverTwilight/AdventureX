@@ -1,16 +1,17 @@
 import React, { useState } from 'react'
-import { isBoolean } from 'util';
 
-type eleCon = {
-    header: string,
-    placeholder: string,
+interface eleCon
+    extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'webkitdirectory' | 'size' | 'prefix' | 'type'> {
+    header?: string,
+    placeholder?: string,
     id: string,
-    block: boolean,
-    type?: 'input' | 'switch'
+    block?: boolean,
+    type?: 'input' | 'switch',
 }
 
-const Form = ({ config, onValueChange, defaultValue = {} }: {
+const Form = ({ config, onValueChange, defaultValue = {}, ...props }: {
     config: eleCon[],
+    focus?: number,
     onValueChange: (newForm: any) => void,
     defaultValue?: {
         [key: string]: any
@@ -29,22 +30,21 @@ const Form = ({ config, onValueChange, defaultValue = {} }: {
                     case 'switch': return (
                         <React.Fragment key={id}>
                             <label className="paper-switch">
-                                <input id="paperSwitch4" name="paperSwitch4" type="checkbox" />
+                                <input {...props} type="checkbox" />
                                 <span className="paper-switch-slider"></span>
                             </label>
                             {header && <label data-for="paperSwitch4" className="paper-switch-label">
                                 {header}
                             </label>}
                         </React.Fragment>
-
                     )
                     default: return (
                         <React.Fragment key={id}>
-                            {header && <label data-for={index} >{header}</label>}
-                            <input onChange={e => {
+                            {header && <label data-for={id} >{header}</label>}
+                            <input autoComplete="false" {...props} onChange={e => {
                                 formContent[id] = e.target.value
                                 onValueChange(formContent)
-                            }} value={formContent[id]} className={`${block && "input-block"}`} type="text" placeholder={placeholder} id={String(index)} />
+                            }} value={formContent[id]} className={`${block && "input-block"}`} type="text" placeholder={placeholder} id={id} />
                         </React.Fragment>
                     )
                 }
