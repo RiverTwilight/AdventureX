@@ -11,11 +11,23 @@ type ModuleConfig = {
     }[]
 }
 
+interface IDrawer {
+    show: boolean,
+    className: string
+}
+
 const AutoFill = styled.ul`
     max-height: 100px
     overflow: scroll
 `
-const Drawer = styled.div`
+
+const NoneStyledDrawer: React.SFC<IDrawer> = ({ children, className, ...props }) => (
+    <div className={className} {...props}>
+        {children}
+    </div>
+)
+
+const Drawer = styled(NoneStyledDrawer)`
     transition: all 1s;
     position: fixed;
     top: 0px;

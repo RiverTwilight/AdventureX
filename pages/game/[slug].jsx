@@ -101,7 +101,7 @@ const Caption = styled.div`
     }
     margin-top: 71vh;
     font-size: 18px;
-    animation: ${props => props.delay * 200}ms linear shockin${props => props.delay} forwards;
+    animation: ${props => props.delay * 820}ms linear shockin${props => props.delay} forwards;
 `
 
 const ScrollText = ({ text, action, onClick }) => {
@@ -111,10 +111,10 @@ const ScrollText = ({ text, action, onClick }) => {
         window.int = setInterval(() => {
             let target = document.querySelector('.test:last-child');
             if (target.getBoundingClientRect().bottom < 500) {
-                clearInterval(int);
+                // clearInterval(int);
                 document.querySelector('#caption').style.animationPlayState = 'paused'
             }
-        }, 800)
+        }, 700)
         return () => {
             clearInterval(int)
         }
@@ -167,7 +167,7 @@ class App extends React.Component {
             // 执行过的游戏模块文案
             historyText: [props.gameStory[0].text],
             // 是否播放音乐
-            music: false
+            music: true
         }
     }
     componentDidMount() {
