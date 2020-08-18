@@ -129,6 +129,7 @@ const GameModule = ({ onDelete, returnValue, config }: {
     config: ModuleConfig,
     returnValue(config: ModuleConfig): void
 }) => {
+    if(!config)return null
     const { text, id, action } = config
     const [showEditor, setShowEditor] = useState(false)
     return (

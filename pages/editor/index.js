@@ -158,7 +158,7 @@ class Editor extends React.Component {
                                     </div>
                                     <div className="content" id="content2">
                                         <div className="row">
-                                            {gameModule.map((config, i) => (
+                                            {gameModule.length && gameModule.map((config, i) => (
                                                 <GameModule
                                                     config={config}
                                                     returnValue={newConfig => {
