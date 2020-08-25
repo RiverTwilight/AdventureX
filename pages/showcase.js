@@ -58,7 +58,7 @@ class ShowCase extends React.Component {
                                         <p className="card-text"></p>
                                         <a
                                             className="paper-btn"
-                                            href={`/game/${slug}`}
+                                            href={`/theme1/${slug}`}
                                         >开始游戏</a>
                                     </div>
                                 </div>

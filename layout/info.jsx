@@ -8,6 +8,7 @@ const Info = styled.button`
     border-bottom-left-radius: 185px 190px;
     position: fixed;
     top: 5px;
+    z-index: 5;
    ${props => !isNaN(props.order) && css`
     right: ${props.order * 50 + 5 }px
   `};
