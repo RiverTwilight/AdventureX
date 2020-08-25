@@ -60,7 +60,7 @@ export async function getStaticPaths() {
     )
 
     // create paths with `slug` param
-    const paths = gameSlugs.map(slug => `/game/${encodeURI(slug)}`)
+    const paths = gameSlugs.map(slug => `/theme2/${encodeURI(slug)}`)
 
     return {
         paths,
