@@ -34,10 +34,20 @@ export async function getStaticProps({ ...ctx }) {
 	const data = content.default;
 	const config = await import(`../../data/config.json`);
 
+	const preloadList = {
+		image: Object.keys(data.story).map(key => {
+			console.log(data.story[key])
+			if(data.story[key].image)return data.story[key].image.src
+		}).filter(item => item)
+	} 
+
+	console.log(preloadList)
+
 	return {
 		props: {
 			allGames: games,
 			slug,
+			preloadList,
 			gameStory: data.story,
 			gameConfig: data.config,
 			siteConfig: config.default,
@@ -90,19 +100,15 @@ const Mask = styled.div`
 		`}
 `;
 
-const StyledImage = styled.div`
+const StyledImage = styled.img`
 	order: 0;
 	flex-grow: 2;
 	height: 50vh;
-	${(props) =>
-		props.src &&
-		css`
-			background: url(${props.src});
-		`}
 `;
 
 const StyledScrollText = styled.div`
 	order: 1;
+	cursor: pointer;
 	flex-shrink: 0;
 	-moz-user-select: none; /*火狐*/
 	-webkit-user-select: none; /*webkit浏览器*/
@@ -165,14 +171,7 @@ const ScrollText = ({ text, action, onClick, onPointChange }) => {
 			className="paper"
 		>
 			<Caption>
-				<p
-					style={{
-						cursor: "pointer",
-					}}
-					className="test"
-				>
-					{paras[para].trim()}
-				</p>
+				<p className="test">{paras[para].trim()}</p>
 				{action &&
 					para >= paras.length - 1 &&
 					action.map((act, i, actions) => (
@@ -205,7 +204,7 @@ class App extends React.Component {
 			// 执行过的游戏模块文案
 			historyText: [props.gameStory[0].text],
 			// 是否播放音乐
-			music: false,
+			music: true,
 			image: "/images/bg2.png",
 			point: 0,
 		};
@@ -222,6 +221,9 @@ class App extends React.Component {
 		}
 		this.toggleBgm();
 		this.toggleImage();
+		if (this.props.gameConfig.bg) {
+			document.body.style.backgroundImage = `url(${this.props.gameConfig.bg})`;
+		}
 	}
 	toggleImage() {
 		const { image, point, id } = this.state;
@@ -233,8 +235,9 @@ class App extends React.Component {
 		}
 	}
 	toggleBgm() {
-		var bgm = this.props.gameStory[this.state.id].image;
-		if (bgm && this.audioDom.src !== bgm) {
+		var bgm = this.props.gameStory[this.state.id].bgm;
+		if (bgm && this.audioDom.src !== `${window.location.origin + bgm}`) {
+			// console.log("replace music", this.audioDom.src, bgm);
 			this.audioDom.src = this.props.gameStory[this.state.id].bgm;
 		}
 		if (this.state.music) {
@@ -243,18 +246,31 @@ class App extends React.Component {
 			this.audioDom.pause();
 		}
 	}
+	shouldComponentUpdate(nextProps, nextState) {
+		const { music, id, point } = nextState;
+		return (
+			music !== this.state.music ||
+			id !== this.state.id ||
+			point !== this.state.point
+		);
+	}
 	componentDidUpdate() {
 		this.toggleBgm();
 		this.toggleImage();
 	}
 	render() {
-		const { id, music, historyText, poi, image } = this.state;
+		const { id, music, historyText, image } = this.state;
 		const { gameStory, gameConfig, siteConfig } = this.props;
 		return (
 			<Layour
 				currentPage={gameConfig.name}
 				siteConfig={this.props.siteConfig}
 			>
+				<link
+					rel="preload"
+					href="https://i.loli.net/2020/09/06/x6a81HjLvI7tsPw.png"
+					as="image"
+				></link>
 				<div className="row">
 					<div className="md-8 col">
 						<Container>
