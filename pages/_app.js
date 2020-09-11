@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import '../node_modules/papercss/dist/paper.min.css'
 import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }) {

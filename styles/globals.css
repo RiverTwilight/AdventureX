@@ -5,6 +5,7 @@ body {
   background-image: url(/images/editorBg.png);
   overflow-x: hidden;
   animation: animation 100s linear infinite alternate;
+  background-size: cover;
 }
 
 @keyframes animation {
@@ -27,10 +28,3 @@ body {
   animation: 0.8s fadeinanimation forwards;
 }
 
-.tabs > input {
-  display: none !important;
-}
-
-.tabs input {
-  display: block;
-}

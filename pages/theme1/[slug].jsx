@@ -6,7 +6,6 @@ import styled, { css } from "styled-components";
 import glob from "glob";
 
 export async function getStaticProps({ ...ctx }) {
-	console.log(ctx);
 	const games = ((context) => {
 		const keys = context.keys();
 		const values = keys.map(context);
@@ -35,13 +34,15 @@ export async function getStaticProps({ ...ctx }) {
 	const config = await import(`../../data/config.json`);
 
 	const preloadList = {
-		image: Object.keys(data.story).map(key => {
-			console.log(data.story[key])
-			if(data.story[key].image)return data.story[key].image.src
-		}).filter(item => item)
-	} 
+		image: Object.keys(data.story)
+			.map((key) => {
+				console.log(data.story[key]);
+				if (data.story[key].image) return data.story[key].image.src;
+			})
+			.filter((item) => item),
+	};
 
-	console.log(preloadList)
+	console.log(preloadList);
 
 	return {
 		props: {
@@ -73,31 +74,22 @@ export async function getStaticPaths() {
 	};
 }
 
-const Mask = styled.div`
-	height: 20px;
-	position: inherit;
+const Menu = styled.div`
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: -200px;
+	width: 180px;
+	background: white;
+	transition: all 0.5s;
+	padding-top: 20px;
+    padding-left: 5px;
+    border-left: 2px solid;
 	${(props) =>
-		props.bottom &&
+		props.visible &&
 		css`
-			margin-top: -18px;
-			background-image: linear-gradient(rgba(255, 255, 255, 0), #fff);
-			background: -o-linear-gradient(
-				bottom,
-				rgba(255, 255, 255, 0.1),
-				rgba(255, 255, 255, 0)
-			);
-		`}
-	${(props) =>
-		props.top &&
-		css`
-			margin-bottom: -20px;
-			background-image: linear-gradient(#fff, rgba(255, 255, 255, 0));
-			background: -o-linear-gradient(
-				top,
-				rgba(255, 255, 255, 0.1),
-				rgba(255, 255, 255, 0)
-			);
-		`}
+			right: 0px;
+		`};
 `;
 
 const StyledImage = styled.img`
@@ -106,7 +98,16 @@ const StyledImage = styled.img`
 	height: 50vh;
 `;
 
-const StyledScrollText = styled.div`
+const StyledInteractive = styled.div`
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: white;
+	height: 100px;
+	border: 2px solid;
+	border-radius: 3px;
+	padding: 5px 10px;
 	order: 1;
 	cursor: pointer;
 	flex-shrink: 0;
@@ -115,19 +116,35 @@ const StyledScrollText = styled.div`
 	-ms-user-select: none; /*IE10*/
 	-khtml-user-select: none; /*早期浏览器*/
 	user-select: none;
+	.caption: {
+		font-size: 18px;
+	}
+	.btn {
+		min-width: 120px;
+		height: 40px;
+		padding: 5px;
+		background: none;
+		margin-left: 5px;
+		border: 1px solid;
+	}
+`;
+
+const Lock = styled.div`
+	@media screen and (orientation: landscape) {
+		display: none !important;
+	}
 `;
 
 const Container = styled.div`
+	@media screen and (orientation: portrait) {
+		display: none !important;
+	}
 	display: flex;
 	min-height: 90vh;
 	flex-direction: column;
 	justify-content: space-between;
 	font-size: calc(10px + 2vmin);
 	transition: all 0.4s;
-`;
-
-const Caption = styled.div`
-	font-size: 18px;
 `;
 
 const Travia = ({ gameConfig, siteConfig }) => {
@@ -156,28 +173,27 @@ const Travia = ({ gameConfig, siteConfig }) => {
 	);
 };
 
-const ScrollText = ({ text, action, onClick, onPointChange }) => {
+const Interactive = ({ text, action, onClick, onPointChange }) => {
 	const [para, setPara] = useState(0);
 	const paras = text.split("\n").filter((p) => p.trim().length !== 0);
 	if (!text) return null;
 	return (
-		<StyledScrollText
+		<StyledInteractive
 			onClick={() => {
 				if (para < paras.length - 1) {
 					setPara(para + 1);
 					onPointChange(para + 1);
 				}
 			}}
-			className="paper"
 		>
-			<Caption>
+			<div class="caption">
 				<p className="test">{paras[para].trim()}</p>
 				{action &&
 					para >= paras.length - 1 &&
 					action.map((act, i, actions) => (
 						<button
 							key={act.to + act.text.substr(0, 3)}
-							className="btn-small test"
+							className="btn"
 							onClick={() => {
 								setPara(0);
 								onClick(act.to);
@@ -186,8 +202,8 @@ const ScrollText = ({ text, action, onClick, onPointChange }) => {
 							{act.text}
 						</button>
 					))}
-			</Caption>
-		</StyledScrollText>
+			</div>
+		</StyledInteractive>
 	);
 };
 
@@ -204,9 +220,10 @@ class App extends React.Component {
 			// 执行过的游戏模块文案
 			historyText: [props.gameStory[0].text],
 			// 是否播放音乐
-			music: true,
-			image: "/images/bg2.png",
+			music: false,
+			image: props.gameStory[0].image,
 			point: 0,
+			menuVisible: false,
 		};
 	}
 	componentDidMount() {
@@ -221,9 +238,6 @@ class App extends React.Component {
 		}
 		this.toggleBgm();
 		this.toggleImage();
-		if (this.props.gameConfig.bg) {
-			document.body.style.backgroundImage = `url(${this.props.gameConfig.bg})`;
-		}
 	}
 	toggleImage() {
 		const { image, point, id } = this.state;
@@ -247,11 +261,12 @@ class App extends React.Component {
 		}
 	}
 	shouldComponentUpdate(nextProps, nextState) {
-		const { music, id, point } = nextState;
+		const { music, id, point, menuVisible } = nextState;
 		return (
 			music !== this.state.music ||
 			id !== this.state.id ||
-			point !== this.state.point
+			point !== this.state.point ||
+			menuVisible !== this.state.menuVisible
 		);
 	}
 	componentDidUpdate() {
@@ -259,7 +274,7 @@ class App extends React.Component {
 		this.toggleImage();
 	}
 	render() {
-		const { id, music, historyText, image } = this.state;
+		const { id, music, historyText, image, menuVisible } = this.state;
 		const { gameStory, gameConfig, siteConfig } = this.props;
 		return (
 			<Layour
@@ -271,61 +286,60 @@ class App extends React.Component {
 					href="https://i.loli.net/2020/09/06/x6a81HjLvI7tsPw.png"
 					as="image"
 				></link>
-				<div className="row">
-					<div className="md-8 col">
-						<Container>
-							<Image src={image} />
-							<ScrollText
-								action={gameStory[id].action}
-								onClick={(to) => {
-									this.setState({
-										id: to,
-										historyText: [
-											...historyText,
-											gameStory[to].text,
-										],
-									});
-								}}
-								onPointChange={(poi) => {
-									this.setState({
-										point: poi,
-									});
-								}}
-								text={gameStory[id].text}
-							/>
-							<Info
-								icon={music ? "🔊" : "🔈"}
-								alt={"音乐"}
-								order={0}
-								onClick={() => {
-									this.setState(
-										{
-											music: !music,
-										},
-										this.toggleBgm
-									);
-								}}
-							/>
-							<audio
-								loop
-								autoPlay
-								volume={50}
-								ref={(r) => (this.audioDom = r)}
-								style={{ display: "none" }}
-								controls={false}
-								type="audio/m4a"
-							>
-								Your browser does not support the audio tag.
-							</audio>
-						</Container>
-					</div>
-					<div className="col md-4">
+				<Lock>
+					<i></i>
+					<br></br>
+					请使用移动终端竖屏浏览,体验更佳
+				</Lock>
+				<Container>
+					<Image src={image} />
+					<Interactive
+						action={gameStory[id].action}
+						onClick={(to) => {
+							this.setState({
+								id: to,
+								historyText: [
+									...historyText,
+									gameStory[to].text,
+								],
+							});
+						}}
+						onPointChange={(poi) => {
+							this.setState({
+								point: poi,
+							});
+						}}
+						text={gameStory[id].text}
+					/>
+					<Info
+						icon={menuVisible ? "X" : "菜单"}
+						order={0}
+						onClick={() => {
+							this.setState({
+								menuVisible: !menuVisible,
+							});
+						}}
+					/>
+					<audio
+						loop
+						autoPlay
+						volume={50}
+						ref={(r) => (this.audioDom = r)}
+						style={{ display: "none" }}
+						controls={false}
+						type="audio/m4a"
+					>
+						Your browser does not support the audio tag.
+					</audio>
+					<Menu visible={menuVisible}>gfdsg</Menu>
+				</Container>
+
+				{/*<div className="col md-4">
 						<Travia
 							siteConfig={siteConfig}
 							gameConfig={gameConfig}
 						/>
-					</div>
-				</div>
+							</div>*/}
 			</Layour>
 		);
 	}
