@@ -8,6 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "@types/styled-components": "^5.1.2",
     "glob": "^7.1.6",
     "jszip": "^3.5.0",

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import * as React from 'react'
+import TextField from '@material-ui/core/TextField';
 
 interface eleCon
     extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'webkitdirectory' | 'size' | 'prefix' | 'type'> {
@@ -39,13 +40,7 @@ const Form = ({ config, onValueChange, defaultValue = {}, ...props }: {
                         </React.Fragment>
                     )
                     default: return (
-                        <React.Fragment key={id}>
-                            {header && <label data-for={id} >{header}</label>}
-                            <input autoComplete="false" {...props} onChange={e => {
-                                formContent[id] = e.target.value
-                                onValueChange(formContent)
-                            }} value={formContent[id]} className={`${block && "input-block"}`} type="text" placeholder={placeholder} id={id} />
-                        </React.Fragment>
+                        <TextField id="standard-basic" label="Standard" />
                     )
                 }
             })}

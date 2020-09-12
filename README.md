@@ -6,7 +6,7 @@
 
 Demo: [https://game.yungeeker.com](https://game.yungeeker.com)
 
-开源免费的文字游戏网站，你可以使用我们的编辑器创建你自己的游戏，并通过PR或发送邮件来发布你的游戏。网站基于Next.js开发。
+使用编辑器创建你自己的游戏，并通过PR或发送邮件来发布你的游戏让大家游玩。网站基于Next.js开发。
 
 本网站最初是送给朋友的一个礼物，后来我加入了编辑器，允许任何人创建并发布游戏。
 
@@ -34,7 +34,7 @@ Demo: [https://game.yungeeker.com](https://game.yungeeker.com)
 
 ## 发布
 
-所有游戏都保存在`/games/`目录下，在编辑器中导出游戏工程文件，再把文件夹上传到这个目录（Pull Request），等待审核即可。此仓库的任何更新都将自动部署到网站。
+在编辑器中导出游戏工程文件后，你可以从master创建一个分支，将工程文件放进`/games/`目录下，并合并到master分支
 
 ## 开发
 
