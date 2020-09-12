@@ -42,8 +42,6 @@ export async function getStaticProps({ ...ctx }) {
 			.filter((item) => item),
 	};
 
-	console.log(preloadList);
-
 	return {
 		props: {
 			allGames: games,
@@ -83,8 +81,8 @@ const Menu = styled.div`
 	background: white;
 	transition: all 0.5s;
 	padding-top: 20px;
-    padding-left: 5px;
-    border-left: 2px solid;
+	padding-left: 5px;
+	border-left: 2px solid;
 	${(props) =>
 		props.visible &&
 		css`
@@ -175,8 +173,9 @@ const Travia = ({ gameConfig, siteConfig }) => {
 
 const Interactive = ({ text, action, onClick, onPointChange }) => {
 	const [para, setPara] = useState(0);
-	const paras = text.split("\n").filter((p) => p.trim().length !== 0);
 	if (!text) return null;
+	const paras = text.split("\n").filter((p) => p.trim().length !== 0);
+	console.log(paras);
 	return (
 		<StyledInteractive
 			onClick={() => {
@@ -221,27 +220,42 @@ class App extends React.Component {
 			historyText: [props.gameStory[0].text],
 			// 是否播放音乐
 			music: false,
+			// 当前展示的图片
 			image: props.gameStory[0].image,
+			// 执行到的行数
 			point: 0,
+			// 菜单状态
 			menuVisible: false,
+			/****Rewrite Only */
+			gameConfig: props.gameConfig,
+			gameStory: props.gameStory,
+			/******* */
 		};
 	}
 	componentDidMount() {
 		if (localStorage.history) {
 			// this.setState(JSON.parse(localStorage.histroy))
 		}
-		if (location.pathname === "/game/test") {
-			if (localStorage.editorCache) {
-				console.log(JSON.parse(localStorage.editorCache));
-				//this.setState(JSON.parse(localStorage.editorCache))
-			}
+		if (location.search.match(/dev\=true/)) {
+			window.addEventListener(
+				"message",
+				(e) => {
+					this.setState({
+						gameConfig: e.data.gameConfig || {
+							name: "Test",
+						},
+						gameStory: e.data.gameStory,
+					});
+				},
+				false
+			);
 		}
 		this.toggleBgm();
 		this.toggleImage();
 	}
 	toggleImage() {
 		const { image, point, id } = this.state;
-		var data = this.props.gameStory[id].image;
+		var data = this.state.gameStory[id].image;
 		if (data && data.src !== image && data.point >= point) {
 			this.setState({
 				image: data.src,
@@ -249,10 +263,10 @@ class App extends React.Component {
 		}
 	}
 	toggleBgm() {
-		var bgm = this.props.gameStory[this.state.id].bgm;
+		var bgm = this.state.gameStory[this.state.id].bgm;
 		if (bgm && this.audioDom.src !== `${window.location.origin + bgm}`) {
 			// console.log("replace music", this.audioDom.src, bgm);
-			this.audioDom.src = this.props.gameStory[this.state.id].bgm;
+			this.audioDom.src = this.state.gameStory[this.state.id].bgm;
 		}
 		if (this.state.music) {
 			this.audioDom.play();
@@ -261,12 +275,13 @@ class App extends React.Component {
 		}
 	}
 	shouldComponentUpdate(nextProps, nextState) {
-		const { music, id, point, menuVisible } = nextState;
+		const { music, id, point, menuVisible, gameStory } = nextState;
 		return (
 			music !== this.state.music ||
 			id !== this.state.id ||
 			point !== this.state.point ||
-			menuVisible !== this.state.menuVisible
+			menuVisible !== this.state.menuVisible ||
+			gameStory !== this.state.gameStory
 		);
 	}
 	componentDidUpdate() {
@@ -274,8 +289,15 @@ class App extends React.Component {
 		this.toggleImage();
 	}
 	render() {
-		const { id, music, historyText, image, menuVisible } = this.state;
-		const { gameStory, gameConfig, siteConfig } = this.props;
+		const {
+			id,
+			historyText,
+			image,
+			menuVisible,
+			gameStory,
+			gameConfig,
+		} = this.state;
+		const { siteConfig } = this.props;
 		return (
 			<Layour
 				currentPage={gameConfig.name}
@@ -289,7 +311,7 @@ class App extends React.Component {
 				<Lock>
 					<i></i>
 					<br></br>
-					请使用移动终端竖屏浏览,体验更佳
+					请把手机竖过来以获得更好体验。
 				</Lock>
 				<Container>
 					<Image src={image} />

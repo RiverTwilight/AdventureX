@@ -79,10 +79,10 @@ const StyledEditor = styled.div`
 	.preview {
 		background: white;
 		width: 100%;
-        height: 50vh;
-        border-left: 2px solid;
-        border-bottom: 2px solid;
-        box-sizing: border-box;
+		height: 50vh;
+		border-left: 2px solid;
+		border-bottom: 2px solid;
+		box-sizing: border-box;
 	}
 	.preview iframe {
 		width: 100%;
@@ -131,8 +131,20 @@ class Editor extends React.Component {
 	componentWillUnmount() {
 		// window.onbeforeunload = null
 	}
+	updatePreview = () => {
+		const { gameModule, gameConfig, previewLoaded } = this.state;
+		const updateData = {
+			gameStory: { ...gameModule },
+			gameConfig,
+		};
+		if (previewLoaded) {
+			const iframe = this.iframeDom;
+			iframe.contentWindow.postMessage(updateData, location.origin);
+		}
+	};
 	componentDidUpdate() {
-		const { gameModule, gameConfig } = this.state;
+		const { gameModule, gameConfig, previewLoaded } = this.state;
+		this.updatePreview();
 		localStorage.setItem(
 			"editorCache",
 			JSON.stringify({
@@ -168,7 +180,7 @@ class Editor extends React.Component {
 		});
 	}
 	render() {
-		const { gameModule, gameConfig, activeTab, iframeLoaded } = this.state;
+		const { gameModule, gameConfig, activeTab, previewLoaded } = this.state;
 		const { siteConfig } = this.props;
 		return (
 			<Layour siteConfig={this.props.siteConfig} currentPage="编辑器">
@@ -180,13 +192,20 @@ class Editor extends React.Component {
 					/>
 					<div className="right-warpper">
 						<div className="preview">
-							{iframeLoaded ? (
-								<iframe src="/theme1/duck"></iframe>
-							) : (
-								<div class="preview-alert">
+							<iframe
+								onLoad={() => {
+									this.setState({
+										previewLoaded: true,
+									});
+								}}
+								ref={(r) => (this.iframeDom = r)}
+								src="/theme1/duck?dev=true"
+							></iframe>
+
+							{/*<div class="preview-alert">
 									<SportsEsportsIcon />
-								</div>
-							)}
+								</div>*/}
+
 							<Fab
 								size="small"
 								color="secondary"
